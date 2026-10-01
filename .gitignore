@@ -1,0 +1,48 @@
+# 数据卷
+data/
+
+# 项目内本地工具（完整 Maven 发行版，仅本机使用，不属于源码）
+.tools/
+
+# Java
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# 环境变量与密钥（切勿提交）
+.env
+.env.local
+*.local.yml
+application-local.yml
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 日志
+logs/
+*.log

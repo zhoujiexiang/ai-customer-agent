@@ -1,0 +1,70 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: agent-backend
+  # 本地密钥文件：不入库（已在 .gitignore），存在则自动加载并覆盖下方的空占位。
+  # 文件不存在时静默跳过，不会启动失败。
+  config:
+    import:
+      - optional:classpath:application-local.yml
+      - optional:file:./application-local.yml
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:15433/agent_db?stringtype=unspecified
+    username: agent
+    password: agent123
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 10000
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+
+app:
+  jwt:
+    secret: agent-demo-jwt-secret-key-please-change-in-production
+    expire-hours: 24
+  llm:
+    base-url: https://api.deepseek.com
+    api-key: ${DEEPSEEK_API_KEY:}
+    chat-model: deepseek-chat
+    timeout-seconds: 60
+  embedding:
+    base-url: https://api.siliconflow.cn/v1
+    api-key: ${SILICONFLOW_API_KEY:}
+    model: BAAI/bge-m3
+    dimension: 1024
+  rag:
+    chunk-size: 500
+    chunk-overlap: 80
+    top-k: 5
+    # 实测依据（scripts/eval-retrieval.py，15 个标注可回答问题 + 4 个知识库外问题）：
+    #   真问题 Top1 分数落在 0.632 ~ 0.813，知识库外问题的最高分只有 0.499 ~ 0.522
+    #   阈值 0.35 时正确拒答率 0%，0.55 时升到 100%，且答案覆盖率仍是 100%
+    score-threshold: 0.55
+  agent:
+    max-steps: 5
+    confirm-timeout-seconds: 60
+  admin:
+    default-username: admin
+    default-password: admin123
+
+logging:
+  level:
+    com.demo.agent: debug

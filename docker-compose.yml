@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: agent-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agent_db
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent123
+      TZ: Asia/Shanghai
+    ports:
+      # 宿主机用 15433 而不是 5433：本机 Hyper-V 保留了 TCP 5383-5482 段，
+      # 绑定 5433 会报 "address already in use"（即便没有任何进程在监听）
+      - "15433:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./backend/src/main/resources/db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent -d agent_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
