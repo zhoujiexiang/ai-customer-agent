@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =====================================================================
-# 一键启动（面试现场演示用，不依赖 IDEA）
+# 一键启动（现场演示用，不依赖 IDE）
 #
 #   bash start.sh              # 起数据库容器 -> 起后端 jar -> 起前端 preview
 #   bash start.sh --rebuild    # 先重新打包前后端再启动
@@ -214,7 +214,7 @@ echo "              帮我查一下订单 202610010003 的物流到哪了       
 echo "              订单 202610010001 我要退款，商品有质量问题        → 写操作二次确认"
 echo "              把订单 202610010005 的收货地址改成杭州市西湖区文三路 100 号 → 写操作可取消"
 echo ""
-echo "  演示流程    docs/演示脚本.md（逐步讲稿 + 常见追问）"
+echo "  演示流程    docs/演示指南.md（场景步骤 + 故障预案）"
 echo "  重置数据    bash start.sh --reset-demo"
 echo ""
 echo "  日志        /tmp/agent-backend.log · /tmp/agent-preview.log"

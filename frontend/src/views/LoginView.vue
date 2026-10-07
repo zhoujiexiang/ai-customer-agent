@@ -64,7 +64,7 @@ async function submit() {
     </div>
 
     <p class="login-foot">
-      个人求职演示项目 · Vue3 + TypeScript + Spring Boot 3 + PostgreSQL/pgvector
+      Vue3 + TypeScript · Spring Boot 3 · PostgreSQL / pgvector
     </p>
   </div>
 </template>

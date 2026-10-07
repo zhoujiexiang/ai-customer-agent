@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * <p>
  * 用 ConcurrentHashMap 而不是 Redis：本项目单实例部署，一个进程内共享内存就够。
  * 如果要多实例部署，这里必须换成 Redis + 发布订阅，否则用户点确认的请求
- * 可能落到另一台机器上找不到挂起的流——这是面试常被追问的一个点。
+ * 可能落到另一台机器上找不到挂起的流——这是当前方案明确的单机边界。
  */
 @Component
 public class ConfirmRegistry {
