@@ -15,7 +15,7 @@
 
 | 层 | 技术 |
 | --- | --- |
-| 前端 | Vue 3.4 + TypeScript + Vite + Pinia + Naive UI |
+| 前端 | Vue 3.5 + TypeScript + Vite + Pinia + Naive UI |
 | 后端 | Java 17 + Spring Boot 3.2 + MyBatis-Plus |
 | 数据库 | PostgreSQL 16 + pgvector |
 | 大模型 | DeepSeek（OpenAI 兼容接口） |
