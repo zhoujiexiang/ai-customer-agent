@@ -4,6 +4,9 @@
 #
 #   bash start.sh              # 起数据库容器 -> 起后端 jar -> 起前端 preview
 #   bash start.sh --rebuild    # 先重新打包前后端再启动
+#   bash start.sh --reset-demo # 同时把演示订单还原（演示前建议带上）
+#
+#   两个参数可以组合：bash start.sh --rebuild --reset-demo
 #
 # 与 scripts/run-ui-check.sh 的分工：
 #   那个是自动化走查，跑完会截图、断言、退出；
@@ -28,7 +31,13 @@ MVN=".tools/apache-maven-3.9.16/bin/mvn"
 VITE="frontend/node_modules/vite/bin/vite.js"
 
 REBUILD=""
-[ "${1:-}" = "--rebuild" ] && REBUILD=yes
+RESET_DEMO=""
+for arg in "$@"; do
+  case "$arg" in
+    --rebuild)    REBUILD=yes ;;
+    --reset-demo) RESET_DEMO=yes ;;
+  esac
+done
 
 BE_PID=""
 FE_PID=""
@@ -101,6 +110,20 @@ if [ -z "$ready" ]; then
   exit 1
 fi
 echo "  ✓ agent-postgres healthy (宿主机端口 15433)"
+
+# 演示数据重置：跑过的演示会把 001 改成「退款中」、把 005 的地址改掉，
+# 不还原的话下一次演示就没法看了（退款会变成「重复申请被拒」，
+# 改地址演示也看不出前后对比）。地址取自 02-seed.sql，别凭记忆写。
+if [ -n "$RESET_DEMO" ]; then
+  if docker exec agent-postgres psql -U agent -d agent_db -q -c \
+       "UPDATE mock_order SET status='已发货' WHERE order_no='202610010001';
+        UPDATE mock_order SET receiver_address='广州市天河区体育西路 12 号维多利广场 B 塔 903'
+          WHERE order_no='202610010005';" >/dev/null 2>&1; then
+    echo "  ✓ 演示数据已重置（001 → 已发货，005 → 地址原值）"
+  else
+    echo "  ! 演示数据重置失败（不影响启动，可稍后手动执行）"
+  fi
+fi
 
 # ---------------------------------------------------------------------
 # 2. 后端 jar
@@ -185,9 +208,14 @@ echo ""
 echo "  应用入口    ${FE_URL}"
 echo "  登录账号    admin / admin123"
 echo ""
-echo "  示例问题    订单 202610010001 我要退款（触发写操作二次确认）"
-echo "              帮我看看 202610010001 的物流"
-echo "              退款一般几天到账？"
+echo "  示例问题    首页四张卡片，点一下即可（只在空对话时显示）"
+echo "              退款一般几天到账？                              → 纯知识库检索"
+echo "              帮我查一下订单 202610010003 的物流到哪了          → 只读工具"
+echo "              订单 202610010001 我要退款，商品有质量问题        → 写操作二次确认"
+echo "              把订单 202610010005 的收货地址改成杭州市西湖区文三路 100 号 → 写操作可取消"
+echo ""
+echo "  演示流程    docs/演示脚本.md（逐步讲稿 + 常见追问）"
+echo "  重置数据    bash start.sh --reset-demo"
 echo ""
 echo "  日志        /tmp/agent-backend.log · /tmp/agent-preview.log"
 echo "  停止        Ctrl+C"

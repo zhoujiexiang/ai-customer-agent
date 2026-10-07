@@ -82,6 +82,16 @@ def search(token, question, top_k=TOP_K):
         return json.loads(resp.read().decode("utf-8"))["data"]["hits"]
 
 
+def fetch_threshold(token):
+    """当前生效的阈值从后端读，而不是在脚本里写死。
+    写死过一次就踩了坑：配置从 0.35 调到 0.55，脚本里的文案没跟着改，
+    报告最后印出一个早已过期的数字 —— 演示时被追问就露馅了。"""
+    url = f"{BASE}/api/kb/search?q={urllib.parse.quote('退款')}&topK=1"
+    req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
+    with opener.open(req, timeout=30) as resp:
+        return float(json.loads(resp.read().decode("utf-8"))["data"]["threshold"])
+
+
 # ----------------------------------------------------------------------
 # 主流程
 # ----------------------------------------------------------------------
@@ -96,6 +106,7 @@ def main():
     print("检索效果评测")
     print(f"测试集：{len(ANSWERABLE)} 个可回答问题 + {len(UNANSWERABLE)} 个应拒答问题，"
           f"每次取 topK={TOP_K}\n")
+    current_threshold = fetch_threshold(token)
 
     # ---------------- 1. 召回质量 ----------------
     print("=" * 76)
@@ -177,7 +188,7 @@ def main():
         print(f"  {t:>6.2f}  {coverage:>9.1f}%  {noise:>7.1f}%  {reject_rate:>10.1f}%")
 
     print("  " + "-" * 72)
-    print(f"  当前 application.yml 配置的阈值为 0.35")
+    print(f"  当前后端生效的阈值（读自 /api/kb/search）为 {current_threshold:.2f}")
     print(f"  综合覆盖率与噪声，建议阈值：{best[1]:.2f}")
     print()
     print("  结论：阈值调高会同时降低噪声和答案覆盖率 —— 这是在「宁可拒答」")

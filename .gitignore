@@ -4,6 +4,11 @@ data/
 # 项目内本地工具（完整 Maven 发行版，仅本机使用，不属于源码）
 .tools/
 
+# 本机双击启动器：硬编码了 Git Bash 的安装路径（C:\Program Files\Git），
+# 只在当前这台机器上有效，别人 clone 下来双击反而会失败，所以不进仓库。
+# 跨机通用入口是 start.sh（Git Bash 里执行）。
+start-demo.bat
+
 # Java
 target/
 *.class

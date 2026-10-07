@@ -66,19 +66,25 @@ ai-customer-agent/
 ### 一键启动（演示 / 面试现场用）
 
 ```bash
-bash start.sh              # 起数据库 -> 打包 -> 起后端 -> 起前端 preview
-bash start.sh --rebuild    # 强制重新打包前后端
+bash start.sh --reset-demo             # 起库 -> 打包 -> 起后端 -> 起前端 preview
+bash start.sh --rebuild --reset-demo   # 强制重打包 + 还原演示订单
 ```
 
 跑完会打印应用地址（`http://127.0.0.1:4173`）与登录账号，`Ctrl+C` 收尾。
 前端跑的是 `build` 之后的真实产物，不依赖 IDEA，也不要求本机装过 Maven。
+
+> **前置：先手动启动 Docker Desktop**（开始菜单点一下，等托盘图标变绿）——
+> 脚本只负责起容器，不会替你启动 Docker 引擎。
+>
+> `--reset-demo` 把演示订单还原成初始状态（`202610010001` 回到「已发货」、
+> `202610010005` 的收货地址还原）。**演示前带上它**，否则退款场景会变成「重复申请被拒」。
 
 > 需要 Git Bash 运行。密钥在打包时已随 `application-local.yml` 进 jar，
 > 想换密钥不必重新打包：把同名的 `application-local.yml` 放在项目根目录即可覆盖。
 
 ---
 
-下面三步是分步启动，适合开发调试。
+下面四步是分步启动，适合开发调试。
 
 ### 1. 配置 API Key
 
@@ -119,7 +125,7 @@ mvn spring-boot:run
 ../.tools/apache-maven-3.9.16/bin/mvn spring-boot:run
 ```
 
-服务地址 `http://localhost:8080`。
+服务地址 `http://127.0.0.1:8080`。
 
 ### 4. 启动前端
 
@@ -129,7 +135,11 @@ npm install
 npm run dev
 ```
 
-访问 `http://localhost:5173`，用 `admin / admin123` 登录。
+访问 `http://127.0.0.1:5173`，用 `admin / admin123` 登录。
+
+> 统一写 `127.0.0.1` 而不是 `localhost`：Node 解析 `localhost` 有时会绑到 IPv6 的 `::1`，
+> 而部分环境不允许监听 IPv6 回环，会直接报 `EACCES`。
+> 前端通过 Vite 的 `/api` 代理访问后端，所以浏览器只需要认这一个源。
 
 ## 页面
 
